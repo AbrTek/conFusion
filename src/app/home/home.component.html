@@ -9,7 +9,7 @@
       </mat-card-title>
     </mat-card-header>
 
-    <img mat-card-image src={{dish.image}} alt={{dish.name}}>
+    <img mat-card-image src="{{BaseURL + dish.image}}" alt={{dish.name}}>
     <mat-card-content>
       <p>{{ dish.description}}</p>
     </mat-card-content>
@@ -27,7 +27,7 @@
       </mat-card-title>
     </mat-card-header>
 
-    <img mat-card-image src={{promotion.image}} alt={{promotion.name}}>
+    <img mat-card-image src="{{BaseURL + promotion.image}}" alt={{promotion.name}}>
     <mat-card-content>
       <p>{{ promotion.description}}</p>
     </mat-card-content>
@@ -45,7 +45,7 @@
       </mat-card-title>
     </mat-card-header>
 
-    <img mat-card-image src={{leader.image}} alt={{leader.name}}>
+    <img mat-card-image src="{{BaseURL + leader.image}}" alt={{leader.name}}>
     <mat-card-content>
       <p>{{ leader.designation}}</p>
       <p>{{ leader.description}}</p>
