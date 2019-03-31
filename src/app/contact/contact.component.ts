@@ -1,24 +1,38 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import {FormBuilder, FormGroup, Validator, Validators} from "@angular/forms";
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import { Feedback, ContactType } from "../shared/feedback";
+import {flyInOut, expand} from "../animations/app.animation";
+import {FeedbackService} from "../services/feedback.service";
 
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.scss']
+  styleUrls: ['./contact.component.scss'],
+  host: {
+    '[@flyInOut]': 'true',
+    'style': 'display: block;'
+  },
+  animations: [
+    flyInOut(),
+    expand()
+  ]
 })
+
 export class ContactComponent implements OnInit {
 
   feedbackForm: FormGroup;
   feedback: Feedback;
+  feedbackCopy: Feedback;
   contactType = ContactType;
+  errMess: string;
   @ViewChild('fform') feedbackFormDirective;
 
   formErrors = {
     'firstname': '',
     'lastname': '',
     'telnum': '',
-    'email': ''
+    'email': '',
+    'message': ''
   };
 
   validationMessages = {
@@ -39,10 +53,16 @@ export class ContactComponent implements OnInit {
     'email': {
       'required': 'Email is required.',
       'email': 'Email not in valid format.'
+    },
+    'message': {
+      'required': 'Feedback is required.',
+      'minlength': 'Feedback must be at least 3 characters long.'
     }
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+              private feedbackService: FeedbackService,
+              @Inject('BaseURL') private BaseURL)  {
     this.createForm();
   }
 
@@ -57,7 +77,7 @@ export class ContactComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       agree: false,
       contacttype: 'None',
-      message:''
+      message:['', [Validators.required, Validators.minLength(3)]]
     });
 
     this.feedbackForm.valueChanges
@@ -90,7 +110,16 @@ export class ContactComponent implements OnInit {
 
   onSubmit() {
     this.feedback = this.feedbackForm.value;
-    console.log(this.feedback);
+    this.feedbackService.submitFeedback(this.feedback)
+      .subscribe(feedback => {
+          this.feedbackCopy = feedback;
+          this.feedback = feedback;
+          setTimeout(() => {this.feedbackCopy = null; this.feedback = null}, 5000);
+        },
+        errmess => {this.feedback = null; this.feedbackCopy=null; this.errMess = <any>errmess});
+
+
+    this.feedbackFormDirective.resetForm();
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',
@@ -100,6 +129,6 @@ export class ContactComponent implements OnInit {
       contacttype: 'None',
       message: ''
     });
-    this.feedbackFormDirective.resetForm();
+
   }
 }
